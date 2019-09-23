@@ -1,3 +1,4 @@
+import pdb
 import random
 from utils import even_perm, n_inversions, solveable
 
@@ -20,6 +21,7 @@ class TileNode(object):
     RIGHT = 1
     DOWN = 2
     LEFT = 3
+    MOVE_MAP = ['U', 'R', 'D', 'L']
 
     def __init__(self, state, prev_node=None, last_move=None, idx=None):
         self.state = state
@@ -27,6 +29,7 @@ class TileNode(object):
         self.last_move = last_move
         self.size = int(len(state) ** 0.5)
         self.idx = self.state.index(len(self.state))
+        self.distance = 0 if prev_node is None else prev_node.distance + 1
 
         if idx is None:
             self.idx = self.state.index(len(state))
@@ -42,15 +45,6 @@ class TileNode(object):
 
     def is_solved(self):
         return all([v == idx + 1 for idx, v in enumerate(self.state)])
-
-    def get_moves(self):
-        cnt = 0
-        curr = self
-
-        while curr is not None:
-            curr = curr.prev_node
-            cnt += 1
-        return cnt
 
     def expand(self):
         '''
@@ -75,7 +69,7 @@ class TileNode(object):
             return None
 
         new_state = gen_new_state(self.state, self.idx, new_idx)
-        return TileNode(new_state, self, TileNode.UP, new_idx)
+        return TileNode(new_state, self, TileNode.DOWN, new_idx)
 
     def move_right(self):
         new_idx = self.idx + 1
@@ -83,7 +77,7 @@ class TileNode(object):
             return None
 
         new_state = gen_new_state(self.state, self.idx, new_idx)
-        return TileNode(new_state, self, TileNode.UP, new_idx)
+        return TileNode(new_state, self, TileNode.RIGHT, new_idx)
 
     def move_left(self):
         new_idx = self.idx - 1
@@ -91,7 +85,7 @@ class TileNode(object):
             return None
 
         new_state = gen_new_state(self.state, self.idx, new_idx)
-        return TileNode(new_state, self, TileNode.UP, new_idx)
+        return TileNode(new_state, self, TileNode.LEFT, new_idx)
 
     @staticmethod
     def random(size):
@@ -102,6 +96,11 @@ class TileNode(object):
             random.shuffle(state)
 
         return TileNode(state)
+
+    def get_moves(self):
+        if self.prev_node is None:
+            return []
+        return self.prev_node.get_moves() + [TileNode.MOVE_MAP[self.last_move]]
 
 if __name__ == '__main__':
     puzzle = TileNode.random(3)

@@ -65,6 +65,15 @@ class TestPuzzle(unittest.TestCase):
         node_left = puzzle.move_left()
         node_right = puzzle.move_right()
 
+    def test_moves(self):
+        puzzle = TileNode([1, 2, 3, 4])
+        p = puzzle.move_up()
+        self.assertEqual(p.distance, 1)
+        p = p.move_left()
+        self.assertEqual(p.distance, 2)
+        p = p.move_down()
+        self.assertEqual(p.distance, 3)
+        self.assertListEqual(p.get_moves(), ['U', 'L', 'D'])
 
 if __name__ == '__main__':
     unittest.main()
