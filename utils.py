@@ -30,3 +30,6 @@ def solveable(perm_state):
         nth_from_bot = n - empty_x
         return ((n_inversions(perm) % 2 == 1) and (nth_from_bot % 2 == 0)) or \
                ((n_inversions(perm) % 2 == 0) and (nth_from_bot % 2 == 1))
+
+def to_string(perm):
+    return ''.join([str(x) for x in perm])

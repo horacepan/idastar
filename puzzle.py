@@ -65,7 +65,7 @@ class TileNode(object):
 
     def move_down(self):
         new_idx = self.idx + self.size
-        if new_idx > len(self.state):
+        if new_idx >= len(self.state):
             return None
 
         new_state = gen_new_state(self.state, self.idx, new_idx)
@@ -101,6 +101,19 @@ class TileNode(object):
         if self.prev_node is None:
             return []
         return self.prev_node.get_moves() + [TileNode.MOVE_MAP[self.last_move]]
+
+    def __lt__(self, other):
+        return self.state < other.state
+
+    def move(self, m):
+        if m == 'U':
+            return self.move_up()
+        elif m == 'R':
+            return self.move_right()
+        elif m == 'D':
+            return self.move_down()
+        elif m == 'L':
+            return self.move_left()
 
 if __name__ == '__main__':
     puzzle = TileNode.random(3)

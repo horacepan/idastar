@@ -75,5 +75,11 @@ class TestPuzzle(unittest.TestCase):
         self.assertEqual(p.distance, 3)
         self.assertListEqual(p.get_moves(), ['U', 'L', 'D'])
 
+        p = p.move('U')
+        p = p.move('R')
+        p = p.move('D')
+        self.assertEqual(p.distance, 6) # eh ...
+        self.assertListEqual(p.get_moves(), ['U', 'L', 'D', 'U', 'R', 'D'])
+
 if __name__ == '__main__':
     unittest.main()
