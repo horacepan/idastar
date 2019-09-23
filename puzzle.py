@@ -1,4 +1,16 @@
+import random
+from utils import even_perm, n_inversions, solveable
+
 def gen_new_state(state, old_idx, new_idx):
+    '''
+    Returns a new state with the elements at the indices swapped
+    Params:
+        state: list of ints of tile puzzle state
+        old_idx: int index of item to be swapped
+        new_idx: other index to be swapped
+    Returns:
+        list of ints
+    '''
     new_state = state[:]
     new_state[old_idx], new_state[new_idx] = new_state[new_idx], new_state[old_idx]
     return new_state
@@ -81,7 +93,16 @@ class TileNode(object):
         new_state = gen_new_state(self.state, self.idx, new_idx)
         return TileNode(new_state, self, TileNode.UP, new_idx)
 
+    @staticmethod
+    def random(size):
+        state = [i for i in range(1, size * size + 1)]
+        random.shuffle(state)
+
+        while not solveable(state):
+            random.shuffle(state)
+
+        return TileNode(state)
+
 if __name__ == '__main__':
-    state = [1, 3, 4, 8, 9, 7, 2, 6, 5, 16, 11, 12, 13, 14, 15, 10]
-    puzzle = TileNode(state)
+    puzzle = TileNode.random(3)
     print(puzzle)
