@@ -1,3 +1,6 @@
+import os
+import psutil
+
 def n_inversions(perm):
     n_invs = 0
     for idx, x in enumerate(perm):
@@ -33,3 +36,11 @@ def solveable(perm_state):
 
 def to_string(perm):
     return ''.join([str(x) for x in perm])
+
+def check_memory(verbose=True):
+    # return the memory usage in MB
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info()[0] / float(2 ** 20)
+    if verbose:
+        print("Consumed {:.2f}mb memory".format(mem))
+    return mem

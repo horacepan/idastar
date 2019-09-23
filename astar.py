@@ -4,6 +4,7 @@ import time
 import numpy as np
 from heuristics import manhattan
 from puzzle import *
+from utils import check_memory
 
 def astar(node, heuristic):
     results = {}
@@ -42,9 +43,10 @@ expect node object to have the functions:
 '''
 
 if __name__ == '__main__':
-    node = TileNode([2, 8, 3, 1, 5, 6, 4, 7, 9])
-    node = TileNode([9, 3, 6, 1, 2, 7, 4, 5, 8])
+    node = TileNode([6, 8, 5, 1, 9, 7, 4, 2, 3]) # expect 24
     print(node)
     print('Running A* search ...')
     results = astar(node, manhattan)
     print(results)
+    print('Expected distance: 24')
+    check_memory()
