@@ -26,7 +26,6 @@ def idastar(node, heuristic, global_max):
     return results
 
 def idastar_node(node, depth, max_depth, heuristic, results):
-    results['nodes_explored'] += 1
     h = heuristic(node.state)
     if (h + depth > max_depth):
         return h
@@ -34,6 +33,7 @@ def idastar_node(node, depth, max_depth, heuristic, results):
     if node.is_solved():
         return node
 
+    results['nodes_explored'] += 1
     for s in node.expand():
         t = idastar_node(s, depth + 1, max_depth, heuristic, results)
         if not isinstance(t, int):
@@ -48,7 +48,7 @@ def idastar_node(node, depth, max_depth, heuristic, results):
     return h
 
 if __name__ == '__main__':
-    node = TileNode([7, 4, 5, 1, 9, 6, 2, 3, 8])
+    #node = TileNode([7, 4, 5, 1, 9, 6, 2, 3, 8])
     #node = TileNode([8, 1, 5, 4, 2, 3, 6, 9, 7])
     node = TileNode([6, 8, 5, 1, 9, 7, 4, 2, 3]) # expect 24
     print(node)
