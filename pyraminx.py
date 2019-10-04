@@ -1,8 +1,9 @@
+import pdb
 from collections import namedtuple
 
-####################
-# Pyraminx constants
-####################
+######################
+# Pyraminx constants #
+######################
 RIGHT = 0
 LEFT = 1
 TOP = 2
@@ -14,14 +15,14 @@ INV_BACK = 7
 FACES = [RIGHT, LEFT, TOP, BACK, INV_RIGHT, INV_LEFT, INV_TOP, INV_BACK]
 
 ORIENTATIONS = {
-    RIGHT: (0, 1, 1, 0, 0, 0),
-    LEFT:  (1, 0, 0, 0, 0, 1),
-    TOP:   (0, 0, 1, 0, 1, 0),
-    BACK:  (0, 0, 0, 1, 0, 1),
-    INV_RIGHT: (0, 0, 1, 1, 0, 0),
-    INV_LEFT:  (1, 1, 0, 0, 0, 0),
-    INV_TOP:   (1, 0, 1, 0, 0, 0),
-    INV_BACK:  (0, 0, 0, 1, 1, 0),
+    RIGHT: (0, 0, 1, 1, 0, 0),
+    LEFT:  (1, 1, 0, 0, 0, 0),
+    TOP:   (1, 0, 1, 0, 0, 0),
+    BACK:  (0, 0, 0, 1, 1, 0),
+    INV_RIGHT: (0, 1, 1, 0, 0, 0),
+    INV_LEFT:  (1, 0, 0, 0, 0, 1),
+    INV_TOP:   (0, 0, 1, 0, 1, 0),
+    INV_BACK:  (0, 0, 0, 1, 0, 1),
 }
 
 PERMS = {
@@ -139,22 +140,6 @@ def pyraminx_nbrs(puzzle):
         inv_left(puzzle),
     ]
     return nbrs
-
-def test():
-    start = init_pyraminx()
-    face_moves = [top, back, right, left, inv_top, inv_back, inv_right, inv_left]
-    start = init_pyraminx()
-    for move in face_moves:
-        puzz = move(start)
-        puzz = move(puzz)
-        puzz = move(puzz)
-        print(puzz, move)
-
-    print('test inverses')
-    print('t, t inv: {}'.format(inv_top(top(start))))
-    print('b, b inv: {}'.format(inv_back(back(start))))
-    print('r, r inv: {}'.format(inv_right(right(start))))
-    print('l, l inv: {}'.format(inv_left(left(start))))
 
 if __name__ == '__main__':
     test()
