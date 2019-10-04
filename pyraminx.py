@@ -141,5 +141,13 @@ def pyraminx_nbrs(puzzle):
     ]
     return nbrs
 
+def str_unpack(tup):
+    return ('{}' * len(tup)).format(*tup)
+
+def pyraminx_str(puzzle):
+    ori, perm = puzzle
+    str_rep = '{},{}'.format(str_unpack(ori), str_unpack(perm))
+    return str_rep
+
 if __name__ == '__main__':
     test()
