@@ -27,8 +27,8 @@ class TestPyraminx(unittest.TestCase):
     def test_cyc_add(self):
         c1 = (0, 1, 1, 1, 1, 0)
         c2 = (0, 1, 1, 0, 1, 1)
-        self.assertEqual(px_cyc_add(c1, c1), (0,0,0,0,0,0))
-        self.assertEqual(px_cyc_add(c1, c2), (0,0,0,1,0,1))
+        self.assertEqual(px_cyc_add(c1, c1, 2), (0,0,0,0,0,0))
+        self.assertEqual(px_cyc_add(c1, c2, 2), (0,0,0,1,0,1))
 
     def test_wreath_inverse(self):
         start = init_pyraminx()
@@ -46,6 +46,21 @@ class TestPyraminx(unittest.TestCase):
             puzz = move(puzz)
 
             self.assertEqual(start, puzz)
+
+    def test_inv(self):
+        c = (1, 1, 1, 1, 0, 0)
+        p = (1, 2, 3, 4, 5, 6)
+        cinv, pinv = px_inv(c, p)
+        cmul, pmul = px_wreath_mul(c, p, cinv, pinv)
+
+        self.assertEqual(cmul, (0, 0, 0, 0, 0, 0))
+        self.assertEqual(pmul, (1, 2, 3, 4, 5, 6))
+        start = init_pyraminx()
+        for _ in range(10):
+            o1, p1 = random_state()
+            o2, p2 = px_inv(o1, p1)
+            self.assertEqual(start, px_wreath_mul(o1, p1, o2, p2))
+
 
 if __name__ == '__main__':
     unittest.main()

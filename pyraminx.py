@@ -1,5 +1,6 @@
 import pdb
 from collections import namedtuple
+import random
 
 ######################
 # Pyraminx constants #
@@ -34,6 +35,17 @@ PERMS = {
     INV_LEFT:  (6, 1, 3, 4, 5, 2),
     INV_TOP:   (3, 2, 5, 4, 1, 6),
     INV_BACK:  (1, 2, 3, 6, 4, 5)
+}
+
+TIPS = {
+    RIGHT: (1, 0, 0, 0),
+    LEFT:  (0, 1, 0, 0),
+    TOP:   (0, 0, 1, 0),
+    BACK:  (0, 0, 0, 1),
+    INV_RIGHT: (2, 0, 0, 0),
+    INV_LEFT:  (0, 2, 0, 0),
+    INV_TOP:   (0, 0, 2, 0),
+    INV_BACK:  (0, 0, 0, 2)
 }
 
 ###################################
@@ -73,22 +85,25 @@ def px_perm_inv(perm):
             perm.index(5) + 1,
             perm.index(6) + 1)
 
-def px_cyc_add(c1, c2):
-    return (
-        (c1[0] + c2[0]) % 2,
-        (c1[1] + c2[1]) % 2,
-        (c1[2] + c2[2]) % 2,
-        (c1[3] + c2[3]) % 2,
-        (c1[4] + c2[4]) % 2,
-        (c1[5] + c2[5]) % 2
+def px_cyc_add(c1, c2, n):
+    return tuple(
+        (c1[i] + c2[i]) % n for i in range(len(c1))
     )
 
 Pyraminx = namedtuple('Pyraminx', ['orientation', 'perm'])
+PyrTip = namedtuple('PyrTip', ['orientation', 'perm', 'tip'])
+
 def px_wreath_mul(c1, p1, c2, p2):
     p1_dot_c2 = px_perm_dot(p1, c2)
-    ori = px_cyc_add(c1, p1_dot_c2)
+    ori = px_cyc_add(c1, p1_dot_c2, 2)
     perm = px_perm_mul(p1, p2)
     return ori, perm
+
+def px_inv(c, p):
+    pinv = px_perm_inv(p)
+    invc = tuple((2 - i) % 2 for i in c)
+    cinv = px_perm_dot(pinv, invc)
+    return cinv, pinv
 
 #############################
 # Pyraminx puzzle functions #
@@ -96,6 +111,18 @@ def px_wreath_mul(c1, p1, c2, p2):
 
 def init_pyraminx():
     return Pyraminx((0, 0, 0, 0, 0, 0), (1, 2, 3, 4, 5, 6))
+
+def init_pyraminx_tip():
+    return PyrTip((0, 0, 0, 0, 0, 0), (1, 2, 3, 4, 5, 6), (0, 0, 0, 0))
+
+def move_face_tip(puzzle, face):
+    face_ori = ORIENTATIONS[face]
+    face_perm = PERMS[face]
+    face_tip = TIPS[face]
+    tip = px_cyc_add(face_tip, puzzle.tip, 3)
+    ori, perm = px_wreath_mul(face_ori, face_perm,
+                              puzzle.orientation, puzzle.perm)
+    return PyrTip(ori, perm, tip)
 
 def move_face(puzzle, face):
     face_ori = ORIENTATIONS[face]
@@ -128,6 +155,34 @@ def inv_right(puzzle):
 def inv_left(puzzle):
     return move_face(puzzle, INV_LEFT)
 
+def move_tip(puzzle, face):
+    tip = px_cyc_add(TIPS[face], puzzle.tip, 3)
+    return PyrTip(puzzle.orientation, puzzle.perm, tip)
+
+def rtip(puzzle):
+    return move_tip(puzzle, RIGHT)
+
+def ltip(puzzle):
+    return move_tip(puzzle, LEFT)
+
+def ttip(puzzle):
+    return move_tip(puzzle, TOP)
+
+def btip(puzzle):
+    return move_tip(puzzle, BACK)
+
+def irtip(puzzle):
+    return move_tip(puzzle, INV_RIGHT)
+
+def iltip(puzzle):
+    return move_tip(puzzle, INV_LEFT)
+
+def ittip(puzzle):
+    return move_tip(puzzle, INV_TOP)
+
+def ibtip(puzzle):
+    return move_tip(puzzle, INV_BACK)
+
 def pyraminx_nbrs(puzzle):
     nbrs = [
         top(puzzle),
@@ -141,12 +196,46 @@ def pyraminx_nbrs(puzzle):
     ]
     return nbrs
 
+def pyraminx_tip_nbrs(puzzle):
+    nbrs = [
+        top(puzzle),
+        back(puzzle),
+        right(puzzle),
+        left(puzzle),
+        inv_top(puzzle),
+        inv_back(puzzle),
+        inv_right(puzzle),
+        inv_left(puzzle),
+        rtip(puzzle),
+        ltip(puzzle),
+        ttip(puzzle),
+        btip(puzzle),
+        irtip(puzzle),
+        iltip(puzzle),
+        ittip(puzzle),
+        ibtip(puzzle),
+
+    ]
+    return nbrs
+
+def random_state():
+    puzzle = init_pyraminx()
+    for _ in range(100):
+        puzzle = random.choice(pyraminx_nbrs(puzzle))
+
+    return puzzle
+
 def str_unpack(tup):
     return ('{}' * len(tup)).format(*tup)
 
 def pyraminx_str(puzzle):
     ori, perm = puzzle
     str_rep = '{},{}'.format(str_unpack(ori), str_unpack(perm))
+    return str_rep
+
+def pyraminx_tip_str(puzzle):
+    ori, perm, tip = puzzle
+    str_rep = '{},{},{}'.format(str_unpack(ori), str_unpack(perm), str_unpack(tip))
     return str_rep
 
 if __name__ == '__main__':
