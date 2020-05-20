@@ -56,34 +56,19 @@ def px_perm_mul(p1, p2):
     '''
     apply p1 to p2
     '''
-    return (
-        p1[p2[0] - 1],
-        p1[p2[1] - 1],
-        p1[p2[2] - 1],
-        p1[p2[3] - 1],
-        p1[p2[4] - 1],
-        p1[p2[5] - 1],
+    return tuple(
+        p1[p2[i] - 1] for i in range(len(p2))
     )
 
 def px_perm_dot(perm, tup):
     pinv = px_perm_inv(perm)
-    return (
-        tup[pinv[0]-1],
-        tup[pinv[1]-1],
-        tup[pinv[2]-1],
-        tup[pinv[3]-1],
-        tup[pinv[4]-1],
-        tup[pinv[5]-1]
+    return tuple(
+        tup[p-1] for p in pinv
     )
 
 # indexing is actually faster than doing a dic
 def px_perm_inv(perm):
-    return (perm.index(1) + 1,
-            perm.index(2) + 1,
-            perm.index(3) + 1,
-            perm.index(4) + 1,
-            perm.index(5) + 1,
-            perm.index(6) + 1)
+    return tuple(perm.index(i) + 1 for i in range(1, len(perm) + 1))
 
 def px_cyc_add(c1, c2, n):
     return tuple(
@@ -93,17 +78,32 @@ def px_cyc_add(c1, c2, n):
 Pyraminx = namedtuple('Pyraminx', ['orientation', 'perm'])
 PyrTip = namedtuple('PyrTip', ['orientation', 'perm', 'tip'])
 
-def px_wreath_mul(c1, p1, c2, p2):
+def px_wreath_mul(c1, p1, c2, p2, cyc):
     p1_dot_c2 = px_perm_dot(p1, c2)
-    ori = px_cyc_add(c1, p1_dot_c2, 2)
+    ori = px_cyc_add(c1, p1_dot_c2, cyc)
     perm = px_perm_mul(p1, p2)
     return ori, perm
+
+def px_cube_mul(c1, c2):
+    o1, p1, o2, p2 = c1
+    o3, p3, o4, p4 = c2
+    oprod1, pprod1 = px_wreath_mul(o1, p1, o3, p3, 3)
+    oprod2, pprod2 = px_wreath_mul(o2, p2, o4, p4, 2)
+    return oprod1, pprod1, oprod2, pprod2
 
 def px_inv(c, p):
     pinv = px_perm_inv(p)
     invc = tuple((2 - i) % 2 for i in c)
     cinv = px_perm_dot(pinv, invc)
     return cinv, pinv
+
+def px_cyc_inv(t, n):
+    return tuple((n - x) % n for x in t)
+
+def px_wreath_inv(tup, perm, n):
+    pinv = px_perm_inv(perm)
+    twinv = px_cyc_inv(px_perm_dot(pinv, tup), n)
+    return (twinv, pinv)
 
 #############################
 # Pyraminx puzzle functions #
@@ -121,14 +121,14 @@ def move_face_tip(puzzle, face):
     face_tip = TIPS[face]
     tip = px_cyc_add(face_tip, puzzle.tip, 3)
     ori, perm = px_wreath_mul(face_ori, face_perm,
-                              puzzle.orientation, puzzle.perm)
+                              puzzle.orientation, puzzle.perm, 2)
     return PyrTip(ori, perm, tip)
 
 def move_face(puzzle, face):
     face_ori = ORIENTATIONS[face]
     face_perm = PERMS[face]
     ori, perm = px_wreath_mul(face_ori, face_perm,
-                              puzzle.orientation, puzzle.perm)
+                              puzzle.orientation, puzzle.perm, 2)
     return Pyraminx(ori, perm)
 
 def top(puzzle):
